@@ -39,6 +39,12 @@ scheduler = director · your AI model = brain · your tools = hands
 - 🤝 **Call other AI & services** — `ask_model` delegates to a second model, `http_request` calls any HTTP API
 - 🔐 **Encrypted API keys** — stored encrypted with the OS keychain (DPAPI), never plaintext on disk
 
+## 🧩 DeepSeek Harness plugin
+
+ChronoAgent is also available as a **DeepSeek Harness (DSH) plugin** — a host-side scheduled-task agent with the same zero-cost-until-run model, persisted to the session log and recovered across restarts.
+
+See [`dsh-chrono-agent/`](dsh-chrono-agent) for the plugin source and install guide.
+
 ## 🎬 Demo
 
 <!-- TODO: record a 30-second screen capture and drop the GIF link here. -->
