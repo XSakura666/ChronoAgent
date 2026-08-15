@@ -16,16 +16,16 @@
 
 ## 安装步骤（推荐：手动复制，最稳）
 
-> 这些步骤写入 `C:\Users\ren\.dsh`（工作区之外），在沙箱里会触发审批。
+> 这些步骤会写入 DSH 的 home 目录（默认 `~/.dsh`，即 Windows 的 `C:\Users\<你的用户名>\.dsh`）。
 
 1. **复制包进 profile 的 node_modules**（真实复制，不是符号链接——ESM 会按真实路径向上解析依赖）：
 
    ```powershell
-   Copy-Item "D:\ren\Documents\scheduled-agent\dsh-chrono-agent" `
-             "C:\Users\ren\.dsh\profiles\node_modules\dsh-chrono-agent" -Recurse -Force
+   Copy-Item "<你的项目路径>\dsh-chrono-agent" `
+             "$env:USERPROFILE\.dsh\profiles\node_modules\dsh-chrono-agent" -Recurse -Force
    ```
 
-2. **在宿主组合里加一行**。编辑 `C:\Users\ren\.dsh\profiles\web\cordis.patch.yml`，把 `[]` 改成：
+2. **在宿主组合里加一行**。编辑 `$env:USERPROFILE\.dsh\profiles\web\cordis.patch.yml`，把 `[]` 改成：
 
    ```yaml
    - id: chrono-agent
@@ -37,7 +37,7 @@
 ## 备选：`dsh plugin` 安装
 
 ```powershell
-dsh plugin --profile web add file:D:/ren/Documents/scheduled-agent/dsh-chrono-agent
+dsh plugin --profile web add file:<你的项目路径>/dsh-chrono-agent
 ```
 
 然后同样编辑 `cordis.patch.yml` 加行、重启。注意 pnpm 对 `file:` 本地包可能建**符号链接**，ESM 依赖解析会沿真实路径向上找，可能找不到 `@deepseek-ai/*` —— 若遇到 `Cannot find package "@deepseek-ai/dsh-tools"`，改用上面的手动复制法。
