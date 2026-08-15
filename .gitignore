@@ -1,0 +1,22 @@
+# dependencies & build output
+node_modules/
+release/
+dist/
+
+# caches
+.npm-cache/
+.electron-cache/
+.electron-builder-cache/
+
+# logs & temp
+*.log
+npm-debug.log*
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# internal dev notes (not for public repo)
+HANDOFF.md

@@ -1,0 +1,13 @@
+{
+  "name": "dsh-chrono-agent",
+  "version": "0.1.0",
+  "description": "Durable scheduled-task agent for DeepSeek Harness: schedule tasks to auto-execute at a future time, persisted to the session log and recovered across DSH restarts.",
+  "type": "module",
+  "main": "index.js",
+  "license": "MIT",
+  "peerDependencies": {
+    "@deepseek-ai/dsh-tools": "*",
+    "@deepseek-ai/dsh-llm": "*",
+    "@deepseek-ai/cordis": "*"
+  }
+}

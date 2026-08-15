@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>待命智能体</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header>
+    <div class="logo">🕐 <span class="clock">待命智能体</span></div>
+    <div class="status"><span class="dot" id="statusDot"></span><span id="statusText">加载中…</span></div>
+    <button class="btn ghost small" id="openWorkspaceBtn">打开工作目录</button>
+    <button class="btn small" id="settingsBtn">设置</button>
+  </header>
+
+  <main>
+    <section class="card">
+      <h2>新建任务</h2>
+      <textarea id="taskText" placeholder="在这里写下要交给智能体去做的任务，例如：帮我写一篇 500 字的产品介绍，保存到“介绍.md”…"></textarea>
+      <div class="preset-row">
+        <span class="preset-label">快捷时间</span>
+        <button class="chip" data-min="0" type="button">立即</button>
+        <button class="chip" data-min="60" type="button">1 小时后</button>
+        <button class="chip" data-hour="20" type="button">今晚 20:00</button>
+        <button class="chip" data-tomorrow="9" type="button">明天 9:00</button>
+      </div>
+      <div class="row">
+        <input type="datetime-local" id="taskTime" />
+        <select id="taskRepeat">
+          <option value="">不重复</option>
+          <option value="daily">每天</option>
+          <option value="weekly">每周</option>
+          <option value="monthly">每月</option>
+        </select>
+        <button class="btn" id="addBtn">添加到任务列表</button>
+      </div>
+      <div class="hint">到设定时间之前，应用不会调用 AI、不消耗任何 token；到点后自动执行。</div>
+    </section>
+
+    <section class="card">
+      <h2>任务列表</h2>
+      <div class="task-list" id="taskList"></div>
+    </section>
+
+    <section class="card">
+      <h2>记忆目录</h2>
+      <div class="row">
+        <input type="text" id="memSearch" placeholder="搜索历史记忆（关键词空格分隔）…" />
+        <button class="btn small" id="memClearBtn" type="button">清空记忆</button>
+      </div>
+      <div class="task-list" id="memoryList"></div>
+    </section>
+  </main>
+
+  <div class="modal" id="settingsModal">
+    <div class="modal-box">
+      <h2>设置</h2>
+      <div class="field">
+        <label>API 地址（baseUrl，需以 /v1 结尾）</label>
+        <input type="text" id="baseUrl" placeholder="https://api.deepseek.com/v1" />
+        <div class="tip">示例：DeepSeek：https://api.deepseek.com/v1　OpenAI：https://api.openai.com/v1　本地 Ollama：http://localhost:11434/v1</div>
+        <div class="tip"><button class="btn small ghost" id="dsPresetBtn" type="button">一键填入 DeepSeek</button></div>
+      </div>
+      <div class="field">
+        <label>API Key</label>
+        <input type="password" id="apiKey" placeholder="sk-..." />
+      </div>
+      <div class="field">
+        <label>模型名称</label>
+        <input type="text" id="model" placeholder="deepseek-chat" />
+        <div class="tip">例如 deepseek-chat / gpt-4o / qwen-plus 等（取决于你用的服务商）。</div>
+      </div>
+
+      <div class="field">
+        <label>辅助模型（可选：ask_model 工具用来调用另一个模型）</label>
+        <input type="text" id="auxBaseUrl" placeholder="留空则用上面的 API 地址" />
+        <input type="password" id="auxApiKey" placeholder="辅助模型 API Key（留空则用上面的 Key）" />
+        <input type="text" id="auxModel" placeholder="辅助模型名（留空则用上面的模型）" />
+        <div class="tip">配置后可让主智能体把子任务交给另一个模型（翻译、总结、另一家服务商等）。全部留空时 ask_model 会退回用主模型。</div>
+      </div>
+      <div class="field">
+        <label>自定义系统提示词（可选，留空用默认）</label>
+        <input type="text" id="systemPrompt" placeholder="给智能体的全局指令…" />
+      </div>
+
+      <div class="field">
+        <label>MCP 工具服务器（可选：接入你自己的工具）<span id="mcpCount" class="mcp-count"></span></label>
+        <div id="mcpList" class="mcp-list"></div>
+        <div class="mcp-add">
+          <input type="text" id="mcpName" placeholder="名称，如 filesystem" />
+          <input type="text" id="mcpCommand" placeholder="命令，如 npx" />
+          <input type="text" id="mcpArgs" placeholder="参数（空格分隔），如 -y @modelcontextprotocol/server-filesystem C:\data" />
+          <button class="btn small" id="mcpAddBtn" type="button">添加</button>
+        </div>
+        <div class="tip">MCP 是接入第三方工具的标准协议。填好后点下方「保存」，应用会自动连接并让 AI 使用这些工具。</div>
+      </div>
+
+      <label class="check"><input type="checkbox" id="background" /> 关闭窗口后驻留后台（托盘），到点仍执行</label>
+      <label class="check"><input type="checkbox" id="autoStart" /> 开机自动启动</label>
+      <label class="check"><input type="checkbox" id="catchUp" /> 应用关闭期间错过的任务，下次启动时补跑</label>
+      <label class="check"><input type="checkbox" id="mergeBatch" /> 多条任务同时到期时合并成一次执行（更省 token）</label>
+
+      <label class="check"><input type="checkbox" id="allowShell" /> 允许智能体执行命令行（危险！默认关闭）</label>
+      <div class="warn-box">开启「允许执行命令行」后，AI 可以在你的电脑上运行任意命令，可能带来安全风险，请仅在信任的模型和场景下开启。</div>
+
+      <div class="modal-actions">
+        <button class="btn ghost" id="testAiBtn" type="button">测试连接</button>
+        <span style="flex:1"></span>
+        <button class="btn ghost" id="settingsClose">取消</button>
+        <button class="btn" id="saveSettings">保存</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast"></div>
+
+  <script src="renderer.js"></script>
+</body>
+</html>

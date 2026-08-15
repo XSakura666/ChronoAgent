@@ -1,0 +1,62 @@
+{
+  "name": "chrono-agent",
+  "productName": "待命智能体",
+  "version": "0.3.0",
+  "description": "Schedule AI agents like cron jobs — zero token cost until they run.",
+  "main": "main.js",
+  "license": "MIT",
+  "author": "ChronoAgent contributors",
+  "keywords": [
+    "ai",
+    "agent",
+    "scheduler",
+    "cron",
+    "mcp",
+    "model-context-protocol",
+    "llm",
+    "automation",
+    "electron",
+    "desktop"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/XSakura666/ChronoAgent.git"
+  },
+  "homepage": "https://github.com/XSakura666/ChronoAgent#readme",
+  "scripts": {
+    "start": "electron .",
+    "check": "node --check main.js && node --check preload.js && node --check src/store.js && node --check src/ai.js && node --check src/tools.js && node --check src/scheduler.js && node --check src/mcp.js && node --check src/memory.js && node --check renderer/renderer.js",
+    "dist": "electron-builder"
+  },
+  "devDependencies": {
+    "electron": "^33.2.1",
+    "electron-builder": "^26.15.3"
+  },
+  "build": {
+    "appId": "com.local.scheduled-agent",
+    "productName": "待命智能体",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "src/**/*",
+      "renderer/**/*",
+      "assets/**/*"
+    ],
+    "win": {
+      "target": [
+        "nsis",
+        "portable"
+      ],
+      "icon": "assets/icon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true
+    }
+  }
+}
